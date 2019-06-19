@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `{{ .Name }}`;
 CREATE TABLE `{{ .Name }}` (
 {{- range $index, $c := .Columns }}
     {{- if $index }},{{ end }}
