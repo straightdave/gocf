@@ -14,29 +14,33 @@ var (
 	fOutout   = flag.String("o", "", "output file")
 	fTmpl     = flag.String("t", "", "template file name")
 	fGofile   = flag.String("f", "", "Go file name")
-	fDebugLes = flag.Bool("debug:lesphina", false, "debug to show lesphina data")
+	fDebugLes = flag.Bool("debug:les", false, "debug printing lesphina data")
+)
+
+var (
+	crlf = []byte("\r\n")
 )
 
 func main() {
 	flag.Parse()
 
+	if len(*fGofile) == 0 {
+		fmt.Println("Go source file name (-f) was not provided.")
+		return
+	}
+
+	// just display meta data read by lesphina
 	if *fDebugLes {
 		if tables, err := MetaToTables(*fGofile); err != nil {
 			fmt.Println(err)
 		} else {
-			for _, t := range tables {
-				fmt.Println("table:", t.Name)
-				for _, col := range t.Columns {
-					fmt.Printf("Name: %s, Type: %s, RawTag: %s\n", col.Name, col.Type, col.RawTag)
-					fmt.Printf("-> modifiers: %q\n", col.Modifiers)
-				}
-			}
+			print(tables)
 		}
 		return
 	}
 
-	if strings.TrimSpace(*fTmpl) == "" {
-		fmt.Println("blank name")
+	if len(*fTmpl) == 0 {
+		fmt.Println("Template file name (-t) was not provided.")
 		return
 	}
 
@@ -75,5 +79,6 @@ func main() {
 			fmt.Println(err)
 			return
 		}
+		output.Write(crlf)
 	}
 }

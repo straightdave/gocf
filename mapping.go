@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -89,6 +90,16 @@ func MetaToTables(gofile string) ([]*Table, error) {
 	}
 
 	return res, nil
+}
+
+func print(tables []*Table) {
+	for _, t := range tables {
+		fmt.Println("table:", t.Name)
+		for _, col := range t.Columns {
+			fmt.Printf("Name: %s, Type: %s, RawTag: %s\n", col.Name, col.Type, col.RawTag)
+			fmt.Printf("-> modifiers: %q\n", col.Modifiers)
+		}
+	}
 }
 
 func getTag(rawTag string) string {
