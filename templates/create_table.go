@@ -1,0 +1,12 @@
+package templates
+
+// Create ...
+const Create = `
+DROP TABLE IF EXISTS ` + "`" + `{{ .Name }}` + "`" + `;
+CREATE TABLE ` + "`" + `{{ .Name }}` + "`" + ` (
+{{- range $index, $c := .Columns }}
+    {{- if $index }},{{ end }}
+    ` + "`" + `{{ $c.Name }}` + "`" + ` {{ $c.Type }} {{ join $c.Modifiers " " }}
+{{- end }}
+) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+`

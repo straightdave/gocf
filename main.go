@@ -8,9 +8,12 @@ import (
 	"path"
 	"strings"
 	"text/template"
+
+	builtin "github.com/straightdave/gocf/templates"
 )
 
 var (
+	fBuiltin  = flag.String("b", "create", "use built-in templates (...), `create` by default")
 	fOutout   = flag.String("o", "", "output file")
 	fTmpl     = flag.String("t", "", "template file name")
 	fGofile   = flag.String("f", "", "Go file name")
@@ -39,15 +42,30 @@ func main() {
 		return
 	}
 
-	if len(*fTmpl) == 0 {
-		fmt.Println("Template file name (-t) was not provided.")
-		return
-	}
+	var err error
+	var tmpl *template.Template
 
-	tmpl, err := template.
-		New(path.Base(*fTmpl)).
-		Funcs(template.FuncMap{"join": strings.Join}).
-		ParseFiles(*fTmpl)
+	if len(*fTmpl) == 0 {
+		// use built-in templates
+		switch strings.ToLower(*fBuiltin) {
+		case "create":
+			tmpl, err = template.
+				New("create").
+				Funcs(template.FuncMap{"join": strings.Join}).
+				Parse(builtin.Create)
+
+		default:
+			fmt.Println("Unknown built-in template type:", *fBuiltin)
+			return
+		}
+
+	} else {
+		// use custom template files
+		tmpl, err = template.
+			New(path.Base(*fTmpl)).
+			Funcs(template.FuncMap{"join": strings.Join}).
+			ParseFiles(*fTmpl)
+	}
 
 	if err != nil {
 		fmt.Println("failed to parse template:", err)
